@@ -1,13 +1,92 @@
 import React, { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+
 import { Hushlush, Logo } from "../../assets/images";
+import { useAuth } from "../../context/AuthContext";
 
 export const LoginView: React.FC = () => {
+  const navigate = useNavigate();
+  const { login, loginAsGuest } = useAuth();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = () => {};
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [authError, setAuthError] = useState("");
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGuestLoading, setIsGuestLoading] = useState(false);
+
+  const validateForm = (): boolean => {
+    let isValid = true;
+
+    setEmailError("");
+    setPasswordError("");
+    setAuthError("");
+
+    const trimmedEmail = email.trim();
+
+    if (!trimmedEmail) {
+      setEmailError("Please enter your email address.");
+      isValid = false;
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      setEmailError("Please enter a valid email address.");
+      isValid = false;
+    }
+
+    if (!password) {
+      setPasswordError("Please enter your password.");
+      isValid = false;
+    } else if (password.length < 6) {
+      setPasswordError("Password must be at least 6 characters.");
+      isValid = false;
+    }
+
+    return isValid;
+  };
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    setAuthError("");
+
+    try {
+      await login(email.trim(), password);
+
+      navigate("/", { replace: true });
+    } catch (error) {
+      setAuthError(
+        error instanceof Error
+          ? error.message
+          : "Unable to sign in. Please try again.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleGuestLogin = async () => {
+    setAuthError("");
+    setIsGuestLoading(true);
+
+    try {
+      await loginAsGuest();
+
+      navigate("/", { replace: true });
+    } catch {
+      setAuthError("Unable to continue as guest. Please try again.");
+    } finally {
+      setIsGuestLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen w-full flex flex-col justify-between items-center bg-white px-6 py-8 sm:px-8">
@@ -19,12 +98,14 @@ export const LoginView: React.FC = () => {
               alt="Hush Lush Logo"
               className="h-12 w-auto object-contain"
             />
+
             <img
               src={Hushlush}
               alt="Hush Lush"
-              className=" object-contain h-14 w-auto"
+              className="object-contain h-14 w-auto"
             />
           </div>
+
           <p className="text-xs text-gray-600 mt-4 max-w-xs leading-relaxed font-normal">
             Warely Pass Grants Access to Log in at any of Our Partnered
             Restaurants.
@@ -32,55 +113,108 @@ export const LoginView: React.FC = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="w-full space-y-4">
-          <div className="space-y-1.5">
-            <label className="text-sm font-semibold text-gray-900 block">
-              Email
-            </label>
-            <input
-              type="text"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Mail ID"
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 text-xs placeholder:text-gray-400 focus:outline-none focus:border-gray-400 transition"
-              required
-            />
-          </div>
+          <div className="space-y-0">
+            {/* Email */}
+            <div className="space-y-1.5">
+              <label
+                htmlFor="email"
+                className="text-sm font-semibold text-gray-900 block"
+              >
+                Email
+              </label>
 
-          <div className="space-y-1.5">
-            <label className="text-sm font-semibold text-gray-900 block">
-              Password
-            </label>
-            <div className="relative text-xs">
               <input
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
-                className="w-full px-4 py-3 pr-11 rounded-xl border border-gray-200 placeholder:text-gray-400 focus:outline-none focus:border-gray-400 transition"
-                required
+                id="email"
+                type="email"
+                value={email}
+                onChange={(event) => {
+                  setEmail(event.target.value);
+                  setEmailError("");
+                  setAuthError("");
+                }}
+                placeholder="Mail ID"
+                autoComplete="email"
+                disabled={isSubmitting || isGuestLoading}
+                className={`w-full px-4 py-3 rounded-xl border text-xs placeholder:text-gray-400 focus:outline-none transition ${
+                  emailError
+                    ? "border-red-500 focus:border-red-500"
+                    : "border-gray-200 focus:border-gray-400"
+                } disabled:bg-gray-50 disabled:cursor-not-allowed`}
               />
+
+              <p className="min-h-[16px] text-xs text-red-500">
+                {emailError ? emailError : "\u00A0"}
+              </p>
+            </div>
+
+            {/* Password */}
+            <div className="space-y-1.5">
+              <label
+                htmlFor="password"
+                className="text-sm font-semibold text-gray-900 block"
+              >
+                Password
+              </label>
+
+              <div className="relative text-xs">
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(event) => {
+                    setPassword(event.target.value);
+                    setPasswordError("");
+                    setAuthError("");
+                  }}
+                  placeholder="Password"
+                  autoComplete="current-password"
+                  disabled={isSubmitting || isGuestLoading}
+                  className={`w-full px-4 py-3 pr-11 rounded-xl border placeholder:text-gray-400 focus:outline-none transition ${
+                    passwordError
+                      ? "border-red-500 focus:border-red-500"
+                      : "border-gray-200 focus:border-gray-400"
+                  } disabled:bg-gray-50 disabled:cursor-not-allowed`}
+                />
+
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((current) => !current)}
+                  disabled={isSubmitting || isGuestLoading}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none disabled:cursor-not-allowed"
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
+
+              <p className="min-h-[16px] text-xs text-red-500">
+                {passwordError ? passwordError : "\u00A0"}
+              </p>
+            </div>
+
+            <div className="flex justify-end">
               <button
                 type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                disabled={isSubmitting || isGuestLoading}
+                className="text-xs text-[#e52e2e] underline hover:opacity-80 transition font-medium disabled:opacity-50"
               >
-                {showPassword ? (
-                  <EyeOff className="w-4 h-4" />
-                ) : (
-                  <Eye className="w-4 h-4" />
-                )}
+                Use Email-ID Instead
               </button>
             </div>
           </div>
 
-          <div className="flex justify-end pt-0.5">
-            <button
-              type="button"
-              className="text-xs text-[#e52e2e] underline hover:opacity-80 transition font-medium"
+          {authError && (
+            <div
+              role="alert"
+              className="rounded-xl bg-red-50 border border-red-100 px-4 py-3 text-center"
             >
-              Use Email-ID Instead
-            </button>
-          </div>
+              <p className="text-xs text-red-600 font-medium">{authError}</p>
+            </div>
+          )}
 
           <div className="relative flex py-2 items-center justify-center">
             <span className="text-xs text-gray-400 font-medium">Or</span>
@@ -90,7 +224,8 @@ export const LoginView: React.FC = () => {
             <button
               type="button"
               aria-label="Login with Facebook"
-              className="w-14 h-12 flex items-center justify-center rounded-xl border border-gray-200 hover:bg-gray-50 transition"
+              disabled
+              className="w-14 h-12 flex items-center justify-center rounded-xl border border-gray-200 opacity-60 cursor-not-allowed"
             >
               <svg
                 className="w-5 h-5 text-[#1877F2]"
@@ -104,7 +239,8 @@ export const LoginView: React.FC = () => {
             <button
               type="button"
               aria-label="Login with Telegram"
-              className="w-14 h-12 flex items-center justify-center rounded-xl border border-gray-200 hover:bg-gray-50 transition"
+              disabled
+              className="w-14 h-12 flex items-center justify-center rounded-xl border border-gray-200 opacity-60 cursor-not-allowed"
             >
               <svg
                 className="w-5 h-5 text-[#229ED9]"
@@ -118,7 +254,8 @@ export const LoginView: React.FC = () => {
             <button
               type="button"
               aria-label="Login with Google"
-              className="w-14 h-12 flex items-center justify-center rounded-xl border border-gray-200 hover:bg-gray-50 transition"
+              disabled
+              className="w-14 h-12 flex items-center justify-center rounded-xl border border-gray-200 opacity-60 cursor-not-allowed"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path
@@ -155,24 +292,27 @@ export const LoginView: React.FC = () => {
           <div className="pt-1">
             <button
               type="submit"
-              className="w-full py-3.5 bg-[#e52e2e] hover:bg-[#cb2525] active:scale-[0.99] text-white font-medium rounded-xl text-sm transition shadow-xs"
+              disabled={isSubmitting || isGuestLoading}
+              className="w-full py-3.5 bg-[#e52e2e] hover:bg-[#cb2525] active:scale-[0.99] text-white font-medium rounded-xl text-sm transition shadow-xs disabled:opacity-70 disabled:cursor-not-allowed"
             >
-              Submit
+              {isSubmitting ? "Signing in..." : "Submit"}
             </button>
           </div>
 
           <div className="text-center pt-2">
             <button
               type="button"
-              className="text-sm font-semibold text-gray-800 underline hover:text-gray-950 transition"
+              onClick={handleGuestLogin}
+              disabled={isSubmitting || isGuestLoading}
+              className="text-sm font-semibold text-gray-800 underline hover:text-gray-950 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Sign as Guest
+              {isGuestLoading ? "Continuing..." : "Sign as Guest"}
             </button>
           </div>
         </form>
       </div>
 
-      <div className="w-full text-center text-xs flex items-center justify-center ">
+      <div className="w-full text-center text-xs flex items-center justify-center">
         Powered By{" "}
         <span className="ml-1 text-sm font-serif text-[#c43a3a]">
           Hush Lush

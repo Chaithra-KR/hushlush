@@ -1,9 +1,4 @@
-import {
-  createContext,
-  useContext,
-  useState,
-  type ReactNode,
-} from "react";
+import { createContext, useContext, useState, type ReactNode } from "react";
 
 import type { Cart, Product } from "../config/types";
 
@@ -12,11 +7,10 @@ type CartContextType = {
   cartCount: number;
   addToCart: (product: Product) => void;
   removeFromCart: (product: Product) => void;
+  clearCart: () => void;
 };
 
-const CartContext = createContext<CartContextType | undefined>(
-  undefined,
-);
+const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<Cart>({});
@@ -45,6 +39,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
     });
   };
 
+  const clearCart = () => {
+    setCart({});
+  };
+
   const cartCount = Object.values(cart).reduce(
     (total, quantity) => total + quantity,
     0,
@@ -57,6 +55,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         cartCount,
         addToCart,
         removeFromCart,
+        clearCart,
       }}
     >
       {children}

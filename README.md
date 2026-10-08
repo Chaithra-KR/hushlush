@@ -1,32 +1,97 @@
-# Hushlush Hospitality Dashboard
+# Hush Lush Hospitality Dashboard
 
-A sleek, production-grade, and highly responsive web application designed for modern digital hospitality interfaces. Built with fluid user experiences, type-safe workflows, and optimal UI performance in mind.
+A responsive restaurant ordering interface built as part of the Junior Full Stack Developer technical assessment.
 
-## 🚀 Key Features
+The application recreates the provided login/authentication and restaurant menu designs while adding functional authentication, guest access, menu interactions, cart management, table selection, responsive navigation, and micro-interactions.
 
-- **Robust Authentication Flow:** Implements a type-safe context provider managing standard sign-in, multi-tier runtime form validations, and asynchronous error boundaries.
-- **Guest Access Engine:** Seamless one-click bypass workflow mimicking immediate public viewing/guest state tokens.
-- **Adaptive Restaurant Ecosystem:** Fully responsive digital menu grid system built to handle high-density layouts on cross-platform viewport sizes.
-- **Micro-Interactions:** Smooth, hardware-accelerated transitions and subtle component animations built on core interaction design guidelines.
+## Features
+
+### Authentication
+- Responsive login screen based on the provided design
+- Email validation
+- Password validation
+- Invalid credential handling
+- Loading state during authentication
+- Mock authentication service
+- Persistent session using localStorage
+- Protected application routes
+- Automatic redirect for unauthenticated users
+- Logout functionality
+
+### Guest Access
+- "Sign as Guest" flow
+- Guest session persistence
+- Guest users can access the restaurant application without credentials
+
+### Restaurant Menu
+- Responsive restaurant menu layout
+- Food category filtering
+- Dish search
+- Debounced search interaction
+- Empty search results state
+- Reusable product cards
+- Add-to-cart interactions
+
+### Cart & Ordering
+- Add/remove items
+- Quantity management
+- Cart item count
+- Cart drawer
+- Order total calculation
+- Place order interaction
+- Loading state while placing an order
+- Order success state
+- Empty cart state
+
+### Table Selection
+- Table selection modal
+- Indoor/outdoor table sections
+- PAX selection
+- Selected table displayed in the header
+
+### Responsive UI
+- Mobile, tablet, and desktop layouts
+- Responsive navigation
+- Mobile search interaction
+- Responsive cart access
+- Hover and active states
+- Subtle transitions and micro-interactions
+
+### Additional
+- 404 / Not Found page
+- Loading, error, empty, and success states
+- Reusable React components
+- Context-based state management
+- Organized component structure
 
 ---
 
-## 🛠️ Technology Ecosystem
+## Technology Stack
 
-- **Frontend Core:** React 19 (via Vite build toolchain)
-- **Language Layer:** TypeScript (Strict type checking, strict props parsing)
-- **Styling Architecture:** Tailwind CSS (Utility-first system configured for fast fluid layouts)
-- **Navigation Graph:** React Router DOM v6 (Dynamic route guarding and path tables)
+- React 19
+- TypeScript
+- Vite
+- Tailwind CSS
+- React Router DOM
+- React Context API
+- Lucide React
+- ESLint
+- Vitest / React Testing Library *(if added)*
 
 ---
 
-## 🔒 Session & Security Management Note
+## Authentication
 
-To optimize performance and eliminate cross-origin backend roundtrip latency in decoupled environments, this application features a centralized **State Mock Authentication Service layer**. 
+No backend API was provided for the assessment, so authentication is implemented using a mock authentication service.
 
-The validation logic is fully abstracted into isolated state contexts. If deployment requirements necessitate transitioning to a live Express/Node.js microservice architecture in the future, the local data service mock layer can be adapted to an asynchronous remote REST endpoint (`Axios` / `Fetch`) without changing a single line of component layout architecture.
+The authentication logic is separated from the presentation layer and exposed to the application through `AuthContext`.
 
-### 🔑 Local Environment Sign-In Contexts
-* **Default Profile:** `user@test.com`
-* **Default Security Key:** `password123`
-* **Public Pipeline:** Click *"Sign as Guest"* to step over authentication barriers instantly.
+Sessions are persisted locally using `localStorage`.
+
+### Test Credentials
+
+**Username:** `user@test.com`
+
+**Password:** `password123`
+
+Alternatively, users can select **Sign as Guest** to access the application without credentials.

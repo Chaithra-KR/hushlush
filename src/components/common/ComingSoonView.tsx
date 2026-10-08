@@ -1,6 +1,7 @@
 import React from "react";
 import { Construction, ArrowLeft, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 interface ComingSoonProps {
   title: string;
@@ -15,7 +16,11 @@ export const ComingSoonView: React.FC<ComingSoonProps> = ({
 }) => {
   const navigate = useNavigate();
 
+  const { logout } = useAuth();
+
   const handleLogout = () => {
+    logout();
+    navigate("/login", { replace: true });
   };
 
   return (

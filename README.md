@@ -20,26 +20,6 @@ A sleek, production-grade, and highly responsive web application designed for mo
 
 ---
 
-## 📂 System Architecture
-
-The codebase strictly adheres to architectural separation of concerns (SoC), maintaining an absolute divide between layout representation matrices and state machinery:
-
-```text
-├── src/
-│   ├── assets/          # High-resolution design tokens and vector placeholders
-│   ├── components/      # Global atomic design systems (InputFields, Buttons, MenuCards)
-│   ├── context/         # AuthContext.tsx (Centralized state engine for application sessions)
-│   ├── pages/
-│   │   ├── Login.tsx    # Single-instance interface layer for authentication and error-states
-│   │   └── Home.tsx     # The unified dashboard displaying menu catalog systems
-│   ├── routes/          # AppRoutes.tsx (Client-side routing engine and route barriers)
-│   ├── App.tsx          # System-level initialization and context injectors
-│   └── main.tsx         # High-performance Virtual DOM hydration node
-└── README.md
-```
-
----
-
 ## 🔒 Session & Security Management Note
 
 To optimize performance and eliminate cross-origin backend roundtrip latency in decoupled environments, this application features a centralized **State Mock Authentication Service layer**. 

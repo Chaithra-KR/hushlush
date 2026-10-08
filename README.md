@@ -1,6 +1,6 @@
 # Hush Lush Hospitality Dashboard
 
-A responsive restaurant ordering interface built as part of the Junior Full Stack Developer technical assessment. The application recreates the provided authentication and restaurant menu designs with a focus on clean UI, responsive layouts, reusable components, and smooth user interactions.
+A responsive restaurant ordering interface. The application recreates the provided authentication and restaurant menu designs with a focus on clean UI, responsive layouts, reusable components, and smooth user interactions.
 
 ## Features
 
